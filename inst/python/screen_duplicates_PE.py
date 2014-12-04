@@ -22,7 +22,7 @@ parser.add_option('-d', '--directory', help="Directory containing read files to 
                   action="store", type="str", dest="sample_dir", default=None)
 
 parser.add_option('-o', '--output', help="Directory + prefix to output de-duplicated reads",
-                  action="store", type="str", dest="output_dir", default="Deduped")
+                  action="store", type="str", dest="output_dir", default="reads")
 
 parser.add_option('-b', '--start', help="position to start duplication check",
                   action="store", type="int", dest="start", default=10)

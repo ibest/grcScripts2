@@ -54,9 +54,9 @@ parse_screen_duplicates_PE_output <- function(output_file){
   output <- readLines(output_file)
   dedup_res <- output[substring(output,1,6) == "Final:"]
   dedup_res <- rev(dedup_res)[1]
-  dedup_data <- as.numeric(strsplit(dedup_res,split=" \\| | ")[[1]][seq(3,13,by=2)])
-  #  dedup_data <- as.numeric(strsplit(dedup_res,split=" \\| | ")[[1]][seq(2,12,by=2)])
-  #  names(dedup_data) <- c("Reads","Duplicates","Forward","Reverse","Percent","Reads_Sec")
+  dedup_data <- as.numeric(strsplit(dedup_res,split=" \\| | ")[[1]][seq(3,9,by=2)])
+  names(dedup_data) <- c("Reads","Duplicates","Percent","Reads_Sec")
+  return(dedup_data)
 }
 
 
