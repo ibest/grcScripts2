@@ -2,6 +2,7 @@
 
 ## Required versions
 duplicate_version = "2.0.0"
+flash_version = ""
 
 does_app_exist <- function(appName){
   is.null(suppressWarnings(attr(system(paste("which",appName,sep=" "),intern=T,ignore.stdout=T,ignore.stderr=T),"status")))
@@ -45,20 +46,21 @@ screen_duplicates_PE_CHECK <- function(v=duplicate_version{
 screen_duplicates_PE_call <- function(d,o,b=10,l=25,s=FALSE,a=FALSE,q=FALSE){
   return(paste("screen_duplicates_PE.py","-d", d, "-o", o, "-b", b, "-l", l,
                paste0(ifelse(s,"-s ",""), ifelse(a,"-a ",""), ifelse(q,"--quite ","")),
-               ">>", file.path(d,"screen_duplicates_pe_output.txt"), sep=" "))
+               sep=" "))
 }
 
 ## parse the stdout output from screen_duplicates_pe
 ## output_file file to parse
-parse_screen_duplicates_PE_output <- function(output_file){
-  output <- readLines(output_file)
-  dedup_res <- output[substring(output,1,6) == "Final:"]
+parse_screen_duplicates_PE_output <- function(output_lines){
+  dedup_res <- output[substring(output_lines,1,6) == "Final:"]
   dedup_res <- rev(dedup_res)[1]
   dedup_data <- as.numeric(strsplit(dedup_res,split=" \\| | ")[[1]][seq(3,9,by=2)])
   names(dedup_data) <- c("Reads","Duplicates","Percent","Reads_Sec")
   return(dedup_data)
 }
 
+#dup_output = system(screen_duplicates_PE_call(parameters),inter=T)
+#dup_result = parse_screen_duplicates_PE_output(dup_output)
 
 
 #***********************************************************
