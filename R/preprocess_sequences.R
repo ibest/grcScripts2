@@ -1,21 +1,63 @@
 ###### R functions involved in Preprocessing
 
+## Required versions
+duplicate_version = "2.0.0"
+
+does_app_exist <- function(appName){
+  is.null(suppressWarnings(attr(system(paste("which",appName,sep=" "),intern=T,ignore.stdout=T,ignore.stderr=T),"status")))
+}
+
+version_check <- function(appVersion, requiredVersion){
+  ## assume version number is '.' delimeted
+  aV <- strsplit(appVersion,split=".",fixed=T)[[1]]
+  rV <- strsplit(requiredVersion,split=".",fixed=T)[[1]]
+  for (i in seq.int(1,length(rV))){
+    if (is.na(aV[i])) return(FALSE)
+    if (aV[i] < rV[i]) return(FALSE)
+    if (aV[i] > rV[i]) return(TRUE)
+  }
+  return(TRUE)
+}
 #***********************************************************
 # Screening of duplicate sequence
 #***********************************************************
-screen_duplicates_check <- function(v){
-    
+
+## first check to make sure the app exists and is the right version
+## v minimum version number
+screen_duplicates_PE_CHECK <- function(v=duplicate_version{
+    if (!does_app_exist("screen_duplicates_PE.py"))
+      stop(paste("screen_duplicates_PE.py was not found on the path"))
+    res <- suppressWarnings(system("screen_duplicates_PE.py --version",intern = TRUE,ignore.stderr=T))
+    if (length(res) == 0)
+      stop(paste("could not identify version information for screen_duplicates_PE.py"))
+    version <- sapply(strsplit(res,split=" +"),"[[",2L)[1]
+    return(version_check(version, duplicate_version))
 }
 
 ## run the python application screen_duplicates
-# r dirctory that contains the reads
-# o output directory
-# d output results
-screen_duplicates <- function(r,o,d){
-  paste("screen_duplicates_PE.py","-d", r, "-o", o, ">>", file.path(d,"preprocessing_output.txt"), sep=" ")
-  #  paste("screen_duplicates_PE_sra.py","-d", r, "-o", o, ">>", file.path(d,"preprocessing_output.txt"), sep=" ")
+## d directory containing paired reads
+## o output directory
+## b start duplicate comparison position
+## l length of duplicate comparison
+## s skip duplicate detection entirey (effectively just combine reads into a single fastq file)
+## a reads were downloaded from the SRA (requires new IDS)
+## q quite version mode
+screen_duplicates_PE_call <- function(d,o,b=10,l=25,s=FALSE,a=FALSE,q=FALSE){
+  return(paste("screen_duplicates_PE.py","-d", d, "-o", o, "-b", b, "-l", l,
+               paste0(ifelse(s,"-s ",""), ifelse(a,"-a ",""), ifelse(q,"--quite ","")),
+               ">>", file.path(d,"screen_duplicates_pe_output.txt"), sep=" "))
 }
 
+## parse the stdout output from screen_duplicates_pe
+## output_file file to parse
+parse_screen_duplicates_PE_output <- function(output_file){
+  output <- readLines(output_file)
+  dedup_res <- output[substring(output,1,6) == "Final:"]
+  dedup_res <- rev(dedup_res)[1]
+  dedup_data <- as.numeric(strsplit(dedup_res,split=" \\| | ")[[1]][seq(3,9,by=2)])
+  names(dedup_data) <- c("Reads","Duplicates","Percent","Reads_Sec")
+  return(dedup_data)
+}
 
 
 

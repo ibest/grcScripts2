@@ -14,7 +14,7 @@ import string
 ## Parse options and setup ##
 usage = "usage %prog -d [path to directory of raw reads] -o [output file prefix (path + name)] -(blsa) --quite"
 usage += "screen_duplicates_PE.py will process all pairs in the provided directory"
-usage += "if no directory is provided read1 and read2 must be supplied on the command line"
+usage += "\n\tif no directory is provided read1 and read2 must be supplied on the command line"
 usage += "\n\te.g. %prog read1.fastq read2.fastq"
 parser = OptionParser(usage=usage,version="%prog 2.0.0")
 
@@ -22,12 +22,12 @@ parser.add_option('-d', '--directory', help="Directory containing read files to 
                   action="store", type="str", dest="sample_dir", default=None)
 
 parser.add_option('-o', '--output', help="Directory + prefix to output de-duplicated reads",
-                  action="store", type="str", dest="output_dir", default="Deduped")
+                  action="store", type="str", dest="output_dir", default="reads")
 
 parser.add_option('-b', '--start', help="position to start duplication check",
                   action="store", type="int", dest="start", default=10)
 
-parser.add_option('-l', '--length', help="lenght of duplication check",
+parser.add_option('-l', '--length', help="length of duplication check",
                   action="store", type="int", dest="length", default=25)
 
 parser.add_option('-s', '--skip_dup', help="Skip de-dupping, merge files only and format for further processing in seqyclean",
@@ -49,9 +49,9 @@ skip = options.skip
 start = options.start - 1
 end = start + options.length
 
-if len(args) != 0 or sample_dir is None or output_dir is None:
-    parser.print_help()
-    sys.exit()
+#if len(args) != 0 or sample_dir is None or output_dir is None:
+#    parser.print_help()
+#    sys.exit()
 
 def sp_gzip_read(file, bufsize=-1):
     p = Popen('gzip --decompress --to-stdout'.split() + [file], stdout=PIPE, stderr=STDOUT, bufsize=bufsize)
