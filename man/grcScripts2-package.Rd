@@ -3,12 +3,11 @@
 \alias{grcScripts2}
 \docType{package}
 \title{
-What the package does (short line)
-~~ package title ~~
+Genomics Resources Core Analysis
 }
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
+This package was developed for use by the University of Idaho IBEST Genomics resources core for analyzing
+next-generation high-throughput sequencing data. The package utilities will take the user through data filtering, quality trimming, read overlapping, de novo assembly, and mapping reads to a reference. 
 }
 \details{
 \tabular{ll}{
