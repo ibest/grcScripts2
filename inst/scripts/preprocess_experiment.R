@@ -4,13 +4,13 @@
 # Preprocess Experiment
 # preprocesses both fastq files (PE) and SFF files
 # performs
-# 1. Merging and de-deduplcation of reads files
+# 1. Merging and de-deduplication of read files
 # 2. 'cleaning' using seqyclean
 # 2.a checks for phiX in the sequence and removes if found
 # 2.b checks for possible other contaminants or vector sequence if supplied
-# 2.c trims sequence ends by quality and plolyA/T (lucy scheme)
+# 2.c trims sequence ends by quality and polyA/T (lucy scheme)
 # 3. overlaps reads using FLASH (custom)
-# 4. produces final read files (SE,PE1, PE2) and reports results
+# 4. produces final read files (SE, PE1, PE2) and reports results
 #*******************************************************************************
 
 suppressPackageStartupMessages(library("optparse"))

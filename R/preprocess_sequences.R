@@ -2,7 +2,7 @@
 
 ## Required versions
 duplicate_version = "2.0.0"
-flash_version = ""
+flash_version = "1.2.11"
 
 does_app_exist <- function(appName){
   is.null(suppressWarnings(attr(system(paste("which",appName,sep=" "),intern=T,ignore.stdout=T,ignore.stderr=T),"status")))
@@ -89,8 +89,8 @@ seqyclean_illumina <- function(r1,r2,o,minL=150, q=24,folder, sample, i64) {
   }
   paste("seqyclean --ow -qual", q, q, i64_param, vc_param,"-minimum_read_length",minL,"--new2old_illumina -1",r1,"-2",r2,"-o",o, ">>", file.path(folder,sample,"preprocessing_output.txt"),sep=" ")
 }
+## run the application FLASH to join overlapping paired end reads
 
-## run the application flash to join overlapping paired end reads
 join_reads <- function(r1,r2,o,overlap=275,d){
   paste("flash --max-overlap=",overlap," --output-prefix=",o," ",r1," ",r2, " >> ", file.path(d,"preprocessing_output.txt"),sep="")
 }
