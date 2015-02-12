@@ -133,8 +133,7 @@ final_report_fun <- function(f,o){
 }
 
 ## download phiX from NCBI for screen Illumina data, always perform
-get_phiX <- function(){
-  genbank_id <- "NC_001422"
+get_phiX <- function(genbank_id = "NC_001422"){
   URL <- paste("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id=", 
                genbank_id, "&rettype=fasta&retmode=text", 
                sep = "")

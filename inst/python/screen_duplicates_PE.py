@@ -84,7 +84,7 @@ class fastqIter:
         if lines['id'] == '' or lines['seq'] == '' or lines['+'] == '' or lines['qual'] == '':
             raise StopIteration
         else:
-            return lines
+        return lines
 
     @staticmethod
     def parse(handle):
@@ -120,8 +120,8 @@ def main(infile1, infile2, outfile1, outfile2,skip):
         iterator1 = fastqIter(sp_gzip_read(infile1))
         iterator2 = fastqIter(sp_gzip_read(infile2))
     else:
-        iterator1 = fastqIter(infile1)
-        iterator2 = fastqIter(infile2)
+        iterator1 = fastqIter(open(infile1, 'r'))
+        iterator2 = fastqIter(open(infile2, 'r'))
     try:
         while 1:
             c = 0
