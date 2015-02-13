@@ -171,11 +171,6 @@ print "Records processed: %s, PE_written: %s, SE_written: %s" % (i, PE_written, 
 for k in contig_map.keys():
     print "\tFound %s: percent: %.2f, PE mapped: %s, SE mapped: %s" % (k,(2*PE_written+SE_written)/i, contig_map[k]["PE"], contig_map[k]["SE"])
 
-
-    outSE.write("@" + k + '#_1\n')
-    outSE.write(PE1[k][0] + '\n')
-    outSE.write('+\n' + PE1[k][1] + '\n')
-
 if PE_open:
     outPE1.close()
     outPE2.close()
