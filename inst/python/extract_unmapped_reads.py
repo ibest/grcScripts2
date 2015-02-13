@@ -89,11 +89,6 @@ PE_open = False
 for line in insam:
     if i % 100000 == 0 and i > 0 and options.verbose:
         print "Records processed: %s, PE_written: %s, SE_written: %s" % (i, PE_written, SE_written)
-        #print "\t Unwritten: PE1 reads ", len(PE1), "PE2 reads: ", len(PE2)
-        #print "\t Written: %s" % PE_written
-    #if line[0] != "@" and len(line2) > 2:
-    #    flag = int(line2[1])
-    #if line[0] != "@":
     #Comment/header lines start with @
     if line[0] != "@" and len(line.strip().split()) > 2:
         i += 1
@@ -149,21 +144,21 @@ for line in insam:
                 else:
                     PE2[ID] = r2
                 continue
-      # was mapped, count it up
-      contig = line2[2]
-      if contig in contig_map.keys():
+    # was mapped, count it up
+    contig = line2[2]
+    if contig in contig_map.keys():
         if (flag & 0x1 == 0): ## SE
-          contig_map[contig]["SE"] += 1
+            contig_map[contig]["SE"] += 1
         elif (flag & 0x40): ## PE, Just count the first in the pair
-          contig_map[contig]["PE"] += 1
-      else:
+            contig_map[contig]["PE"] += 1
+    else:
         contig_map[contig] = {}
         if (flag & 0x1 == 0): ## SE
-          contig_map[contig]["SE"] = 1
-          contig_map[contig]["PE"] = 0
+            contig_map[contig]["SE"] = 1
+            contig_map[contig]["PE"] = 0
         elif (flag & 0x40): ## PE, Just count the first in the pair
-          contig_map[contig]["SE"] = 0
-          contig_map[contig]["PE"] = 1
+            contig_map[contig]["SE"] = 0
+            contig_map[contig]["PE"] = 1
 
 
 print "Records processed: %s, PE_written: %s, SE_written: %s" % (i, PE_written, SE_written)
