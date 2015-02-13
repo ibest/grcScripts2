@@ -9,9 +9,14 @@
 # 6  Merge and report
 ######
 
-###### Required Software Versions
+###### Required Software Versions and Paths
+contaminant_path = ""
+contaminant_version = "1.0.0"
+duplicate_path = ""
 duplicate_version = "2.0.0"
+sickle_path = "sickle"
 sickle_version = "1.33"
+flash_path = "flash2"
 flash_version = "2.2.00"
 ######
 
@@ -45,17 +50,31 @@ version_check <- function(appVersion, requiredVersion){
 ######
 
 #***********************************************************
+# Contaminant Screening (min PhiX)
+#***********************************************************
+
+contaminant_check <- function(app=contaminant_path,v=contaminant_version){
+  if (!does_app_exist(contaminant_path))
+    stop(paste(contaminant_path,"was not found on the path"))
+  res <- suppressWarnings(system(paste(contaminant_path,"-v"),intern = TRUE,ignore.stderr=T))
+  if (length(res) == 0)
+    stop(paste("could not identify version information for",contaminant_path))
+  version <- sapply(strsplit(res,split=" +"),"[[",2L)[1]
+  return(version_check(version, duplicate_version))  
+}
+
+#***********************************************************
 # Screening of duplicate sequence
 #***********************************************************
 
 ## first check to make sure the app exists and is the right version
 ## v minimum version number
-screen_duplicates_PE_check <- function(v=duplicate_version){
-    if (!does_app_exist("screen_duplicates_PE.py"))
-      stop(paste("screen_duplicates_PE.py was not found on the path"))
-    res <- suppressWarnings(system("screen_duplicates_PE.py --version",intern = TRUE,ignore.stderr=T))
+screen_duplicates_PE_check <- function(app=duplicate_path,v=duplicate_version){
+    if (!does_app_exist(duplicate_path))
+      stop(paste(duplicate_path,"was not found on the path"))
+    res <- suppressWarnings(system(path(duplicate_path,"--version"),intern = TRUE,ignore.stderr=T))
     if (length(res) == 0)
-      stop(paste("could not identify version information for screen_duplicates_PE.py"))
+      stop(paste("could not identify version information for", duplicate_path))
     version <- sapply(strsplit(res,split=" +"),"[[",2L)[1]
     return(version_check(version, duplicate_version))
 }
@@ -68,8 +87,8 @@ screen_duplicates_PE_check <- function(v=duplicate_version){
 ## s skip duplicate detection entirey (effectively just combine reads into a single fastq file)
 ## a reads were downloaded from the SRA (requires new IDS)
 ## q quite version mode
-screen_duplicates_PE_call <- function(d,o,b=10,l=25,s=FALSE,a=FALSE,q=FALSE){
-  return(paste("screen_duplicates_PE.py",
+screen_duplicates_PE_call <- function(duplicate_path,d,o,b=10,l=25,s=FALSE,a=FALSE,q=FALSE){
+  return(paste(duplicate_path,
                "-d", d, 
                "-o", o, 
                "-b", b, 
@@ -98,12 +117,12 @@ screen_duplicates_PE_output <- function(output_lines){
 #***********************************************************
 # sickle, quality trimmer and min length check
 #***********************************************************
-sickle_check <- function(v=sickle_version){
-  if (!does_app_exist("sickle"))
-    stop(paste("sickle was not found on the path"))
-  res <- suppressWarnings(system("sickle --version",intern = TRUE,ignore.stderr=T))
+sickle_check <- function(app=sickle_path,v=sickle_version){
+  if (!does_app_exist(sickle_path)
+    stop(paste(sickle_path,"was not found on the path"))
+  res <- suppressWarnings(system(paste(sickle_path,"--version"),intern = TRUE,ignore.stderr=T))
   if (length(res) == 0)
-    stop(paste("could not identify version information for sickle"))
+    stop(paste("could not identify version information for",sickle_path))
   version <- sapply(strsplit(res[1],split=" +"),"[[",3L)[1]
   return(version_check(version, sickle_version))
 }
@@ -117,8 +136,8 @@ sickle_check <- function(v=sickle_version){
 # folder, folder containing contaminant and vector fasta files (contaminants.fa and/or vector.fa)
 # sample, sample name
 # i64, is data in illumina 64 format (CASAVA 1.3-1.7), otherwise sanger (CASAVA 1.8)
-sickle_pe_call <- function(r1,r2,o,minL=150,q=24,i64=FALSE) {
-    return(paste("sickle pe",
+sickle_pe_call <- function(sickle_path,r1,r2,o,minL=150,q=24,i64=FALSE) {
+    return(paste(sickle_path,"pe",
                  "-g",
                  "-t",ifelse(i64,"illumina","sanger"),
                  "-q", q,
@@ -155,18 +174,18 @@ sickle_output <- function(output_lines){
 #***********************************************************
 # Flash2
 #***********************************************************
-flash2_check <- function(v=flash_version){
-  if (!does_app_exist("flash2"))
-    stop(paste("flash2 was not found on the path"))
-  res <- suppressWarnings(system("flash2 --version",intern = TRUE,ignore.stderr=T))
+flash2_check <- function(app=flash_path,v=flash_version){
+  if (!does_app_exist(flash_path))
+    stop(paste(flash_path,"was not found on the path"))
+  res <- suppressWarnings(system(paste(flash_path,"--version"),intern = TRUE,ignore.stderr=T))
   if (length(res) == 0)
-    stop(paste("could not identify version information for flash2"))
+    stop(paste("could not identify version information for",flash_path))
   version <- sub("v","",sapply(strsplit(res[1],split=" +"),"[[",2L)[1])
   return(version_check(version, flash_version))
 }
 
-flash2_call <- function(r1,r2,o,discard=TRUE,allow_outies=TRUE,max_overlap=700,min_overlap_outie=35,min_overlap_innie=10,mismatch_density=0.25,i64=FALSE,threads=1){
-  return(paste("flash2 ",
+flash2_call <- function(flash_path,r1,r2,o,discard=TRUE,allow_outies=TRUE,max_overlap=700,min_overlap_outie=35,min_overlap_innie=10,mismatch_density=0.25,i64=FALSE,threads=1){
+  return(paste(flash_path,
                "-z",
                "-t", threads,
                "-p",ifelse(i64,"64","33"),

@@ -10,10 +10,14 @@ pe2=NA
 se="-"
 
 
-while getopts "h?t:c:e:o:1:2:U:" opt; do
+while getopts "h?vt:c:e:o:1:2:U:" opt; do
     case "$opt" in
     h|\?)
         echo "there is no help"
+        exit 0
+        ;;
+    v)
+        echo "Version 1.0.0"
         exit 0
         ;;
     t)  threads=$OPTARG
