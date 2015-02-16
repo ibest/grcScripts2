@@ -1,15 +1,15 @@
 ###### R functions involved in Preprocessing of Illumina Reads
 
 ###### Required Software Versions and Paths
-contaminant_path = system.file("inst/bash", "contaminant_screen.sh", package="grcScripts2")
+contaminant_path = system.file("scripts","bash", "contaminant_screen.sh", package="grcScripts2")
 contaminant_version = "2.0.0"
-duplicate_path = system.file("inst/python", "screen_duplicates_PE.py", package="grcScripts2")
+duplicate_path = system.file("scripts","python", "screen_duplicates_PE.py", package="grcScripts2")
 duplicate_version = "2.0.0"
 sickle_path = "sickle"
 sickle_version = "1.33"
 flash_path = "flash2"
 flash_version = "2.2.00"
-extract_unmapped_path = system.file("inst/python", "exract_unmapped_reads.py", package="grcScripts2")
+extract_unmapped_path = system.file("scripts","python", "exract_unmapped_reads.py", package="grcScripts2")
 extract_unmapped_version = "2.0.0"
 ######
 
