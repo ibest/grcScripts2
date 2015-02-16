@@ -17,7 +17,7 @@ while getopts "h?vt:c:e:o:1:2:U:" opt; do
         exit 0
         ;;
     v)
-        echo "Version 1.0.0"
+        echo "Version 2.0.0"
         exit 0
         ;;
     t)  threads=$OPTARG

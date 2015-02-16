@@ -40,7 +40,7 @@ import gzip
 
 
 usage = "usage: %prog [options] -o output_base inputfile.SAM"
-parser = OptionParser(usage=usage)
+parser = OptionParser(usage=usage,version="%prog 2.0.0")
 parser.add_option('-u', '--uncompressed', help="leave output files uncompressed",
                   action="store_true", dest="uncompressed")
 parser.add_option('-o', '--output_base', help="output file basename",
