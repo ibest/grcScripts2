@@ -5,8 +5,6 @@ Version: 1.0
 Date: 2014-12-03
 Authors: Matthew Settles, Samuel Hunter, Alida Gerritsen
 Maintainer: Matthew Settles <msettles@uidaho.edu>
-Description: This package was developed for use by the University of Idaho IBEST Genomics resources core for analyzing
-next-generation high-throughput sequencing data. The package utilities will take the user through data filtering, quality
-trimming, read overlapping, de novo assembly, and mapping reads to a reference. 
+Description: This package was developed for use by the University of Idaho IBEST Genomics resources core for analyzing next-generation high-throughput sequencing data. The package utilities will take the user through data filtering, quality trimming, read overlapping, de novo assembly, and mapping reads to a reference.
 License: Apache 2.0
-Depends: Biostrings, optparse, parallel, ShortRead
+Depends: optparse, parallel

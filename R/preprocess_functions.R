@@ -1,13 +1,4 @@
-###### R functions involved in Preprocessing
-
-###### WORKFLOW
-# 1. Screen reads for contaminants (minimally phiX)
-# 2. deduplicate the reads
-# 3. Run sickle (Trimming by quality)
-# 4. Flash to join reads
-# 5. Kmer normalization
-# 6  Merge and report
-######
+###### R functions involved in Preprocessing of Illumina Reads
 
 ###### Required Software Versions and Paths
 contaminant_path = ""
@@ -19,6 +10,7 @@ sickle_version = "1.33"
 flash_path = "flash2"
 flash_version = "2.2.00"
 ######
+
 
 ## Using 'which' make sure appName exists on the path (is executable)
 does_app_exist <- function(appName){
@@ -60,7 +52,7 @@ contaminant_check <- function(app=contaminant_path,v=contaminant_version){
   if (length(res) == 0)
     stop(paste("could not identify version information for",contaminant_path))
   version <- sapply(strsplit(res,split=" +"),"[[",2L)[1]
-  return(version_check(version, duplicate_version))  
+  return(version_check(version, duplicate_version))
 }
 
 #***********************************************************
@@ -89,13 +81,13 @@ screen_duplicates_PE_check <- function(app=duplicate_path,v=duplicate_version){
 ## q quite version mode
 screen_duplicates_PE_call <- function(duplicate_path,d,o,b=10,l=25,s=FALSE,a=FALSE,q=FALSE){
   return(paste(duplicate_path,
-               "-d", d, 
-               "-o", o, 
-               "-b", b, 
+               "-d", d,
+               "-o", o,
+               "-b", b,
                "-l", l,
                paste0(
-                 ifelse(s,"-s ",""), 
-                 ifelse(a,"-a ",""), 
+                 ifelse(s,"-s ",""),
+                 ifelse(a,"-a ",""),
                  ifelse(q,"--quite ","")),
                sep=" "))
 }
@@ -118,7 +110,7 @@ screen_duplicates_PE_output <- function(output_lines){
 # sickle, quality trimmer and min length check
 #***********************************************************
 sickle_check <- function(app=sickle_path,v=sickle_version){
-  if (!does_app_exist(sickle_path)
+  if (!does_app_exist(sickle_path))
     stop(paste(sickle_path,"was not found on the path"))
   res <- suppressWarnings(system(paste(sickle_path,"--version"),intern = TRUE,ignore.stderr=T))
   if (length(res) == 0)
@@ -158,10 +150,10 @@ sickle_output <- function(output_lines){
   discard_single <- output_lines[substring(output_lines,1,31) == "FastQ single records discarded:"]
   discard_single <- as.numeric(sapply(strsplit(gsub(",|\\(|\\)","",discard_single),split=" "),"[",c(8L,11L)))
 
-  sickle_data <- c(analyzed,discard_single,discard_pair,(analyzed-sum(discard_single,discard_pair)),sum(discard_single),(analyzed-sum(discard_single,discard_pair))/analyzed,(2*analyzed-sum(discard_single,2*discard_pair))/(2*analyzed))  
+  sickle_data <- c(analyzed,discard_single,discard_pair,(analyzed-sum(discard_single,discard_pair)),sum(discard_single),(analyzed-sum(discard_single,discard_pair))/analyzed,(2*analyzed-sum(discard_single,2*discard_pair))/(2*analyzed))
   names(sickle_data) <- c("Pairs","PE1_discarded","PE2_discarded","Both_discarded","Pairs_kept","Single_kept","Pairs_kept_percent","Reads_kept_percent")
   return(sickle_data)
-  
+
 }
 
 #sickle_check()
@@ -214,11 +206,11 @@ flash2_output <- function(output_lines){
 #flash2_out = system(flash2_call(params),intern=TRUE)
 #flash2_result = flash2_output(flash2_out)
 
-flash2_out <- system(flash2_call("Wireworm_nodup_noContaminant_sickle_PE1.fastq.gz","Wireworm_nodup_noContaminant_sickle_PE2.fastq.gz","Wireworm_nodup_noContaminant_sickle_flash",threads= 40),intern=TRUE)
+#flash2_out <- system(flash2_call("Wireworm_nodup_noContaminant_sickle_PE1.fastq.gz","Wireworm_nodup_noContaminant_sickle_PE2.fastq.gz","Wireworm_nodup_noContaminant_sickle_flash",threads= 40),intern=TRUE)
 
 
 #***********************************************************
-# Seqyclean 
+# Seqyclean
 #***********************************************************
 ## run seqyclean on illumina data
 # r1, path to read1
@@ -288,8 +280,8 @@ final_report_fun <- function(f,o){
 
 ## download phiX from NCBI for screen Illumina data, always perform
 get_phiX <- function(genbank_id = "NC_001422"){
-  URL <- paste("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id=", 
-               genbank_id, "&rettype=fasta&retmode=text", 
+  URL <- paste("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id=",
+               genbank_id, "&rettype=fasta&retmode=text",
                sep = "")
   res <- scan(file = URL, what = "", sep = "\n", quiet = TRUE)
   phix <- DNAStringSet(paste(res[-1],collapse=""))
@@ -298,64 +290,5 @@ get_phiX <- function(genbank_id = "NC_001422"){
 }
 
 ##### Actual Preprocessing Workflow
-process_sample <- function(folder,sample,Raw_Folder,Clean_Folder,Final_Folder,qual,minL,overlap,i64){
-  write(paste(sample,":Processing folder ",folder,sep=""),stdout())
-  if(file.info(file.path(Raw_Folder,folder))$isdir){ ## ILLUMINA FOLDER, EXPECT PAIRED READS
-    
-    if(!file.exists(file.path(Clean_Folder, sample))) dir.create(file.path(Clean_Folder, sample),recursive=TRUE,showWarnings=FALSE)
-    
-    output <- file.path(Clean_Folder,sample,paste(sample,sep="_"))
-    write(paste(sample,":\tde-duplicating reads",sep=""),stdout())
-    
-    system(screen_duplicates(file.path(Raw_Folder,folder),output,file.path(Clean_Folder,sample)))
-    
-    ## second use seqyclean to remove contaminant, adapters and trim for quality
-    Read1 <- paste(output,"nodup_PE1.fastq.gz",sep="_")
-    Read2 <- paste(output,"nodup_PE2.fastq.gz",sep="_")
-    output <- file.path(Clean_Folder,sample,paste(sample,"nodup",paste("q",qual,"min",minL,sep=""),sep="_"))
-    write(paste(sample,":\trunning seqyclean",sep=""),stdout())
-    
-    seqyclean_cmd <- seqyclean_illumina(Read1, Read2, output, minL=minL, q=qual, Clean_Folder, sample, i64)
-    system(seqyclean_cmd)
-    
-    ## third use flash to join overlapping paired-end reads
-    Read1 <- paste(output,"_PE1.fastq",sep="")
-    Read2 <- paste(output,"_PE2.fastq",sep="")
-    output <- file.path(Clean_Folder,sample,paste(sample,"nodup",paste("q",qual,"min",minL,sep=""),sep="_"))
-    write(paste(sample,":\tjoining reads",sep=""),stdout())
-    
-    system(join_reads(Read1, Read2,output,overlap=overlap,file.path(Clean_Folder,sample)))
-    
-    ## link the final files to another folder
-    SE1 <- file.path(Clean_Folder,sample,paste(sample,"nodup",paste("q",qual,"min",minL,sep=""),"SE.fastq",sep="_"))
-    SE2 <- file.path(Clean_Folder,sample,paste(sample,"nodup",paste("q",qual,"min",minL,".extendedFrags.fastq",sep=""),sep="_"))
-    
-    Read1 <- file.path(Clean_Folder,sample,paste(sample,"nodup",paste("q",qual,"min",minL,".notCombined_1.fastq",sep=""),sep="_"))
-    Read2 <- file.path(Clean_Folder,sample,paste(sample,"nodup",paste("q",qual,"min",minL,".notCombined_2.fastq",sep=""),sep="_"))
-    output <- file.path(getwd(),Final_Folder,sample,sample)
-    
-    if(!file.exists(file.path(Final_Folder, sample))) dir.create(file.path(Final_Folder,sample),recursive=TRUE,showWarnings=FALSE)
-    write(paste(sample,":\tcreating links to final files in ",file.path(Final_Folder,sample),sep=""),stdout())
-    system(link_illumina(SE1,SE2,Read1,Read2,output))
-    write(paste(sample,":\tFinished",sep=""),stdout())
-    
-    ## end preprocessing
-  } else { ## 454 READS
-    qual454 <- 20
-    minL454 <- 250
-    if(!file.exists(file.path(Clean_Folder, sample))) dir.create(file.path(Clean_Folder,sample),recursive=TRUE,showWarnings=FALSE)
-    SFF <- file.path(Raw_Folder,folder)
-    folder <- sub(".sff","",folder)
-    output <- file.path(getwd(),Clean_Folder,sample,paste(sample,paste("q",qual454,"min",minL454,sep=""),sep="_"))
-    seqyclean_cmd <- seqyclean_454(SFF,output,minL=minL454,q=qual454,Clean_Folder, sample)    
-    write(paste(sample,":\trunning 454 seqyclean",sep=""),stdout())
-    system(seqyclean_cmd)
-    SFF <- paste(output,"sff",sep=".")
-    output <- file.path(getwd(),Final_Folder,sample,sample)
-    if(!file.exists(file.path(Final_Folder, sample))) dir.create(file.path(Final_Folder,sample),recursive=TRUE,showWarnings=FALSE)
-    write(paste(sample,":\tcreating 454 links to final files in ",file.path(Final_Folder,sample),sep=""),stdout())
-    system(link_454(SFF,output))
-    write(paste(sample,":\t454 Finished",sep=""),stdout())
-  }	
-}
+
 
