@@ -7,8 +7,8 @@ duplicate_path = system.file("scripts","python", "screen_duplicates_PE.py", pack
 duplicate_version = "2.0.0"
 sickle_path = "sickle"
 sickle_version = "1.33"
-flash_path = "flash2"
-flash_version = "2.2.00"
+flash2_path = "flash2"
+flash2_version = "2.2.00"
 extract_unmapped_path = system.file("scripts","python", "exract_unmapped_reads.py", package="grcScripts2")
 extract_unmapped_version = "2.0.0"
 ######
