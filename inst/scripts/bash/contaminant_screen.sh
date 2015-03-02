@@ -45,7 +45,7 @@ btargs=$@
 
 wget -O phiX.tmp.fasta "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&rettype=fasta&retmode=text&id=9626372"
 if [ $? -eq 0 ] ; then
- cat $contaminant phiX.tmp.tmp > contaminant_screen.fasta
+ cat $contaminant phiX.tmp.fasta > contaminant_screen.fasta
  bowtie2-build contaminant_screen.fasta contaminant_screen_index
  bowtie_index=contaminant_screen_index
 else
